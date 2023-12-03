@@ -1,0 +1,117 @@
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <h3>All Available Users</h3>
+        </div>
+        <div class="col-md-6">
+            <input type="text" class="form-control" placeholder="Search by Skills" #search (keyup)="filterUsers(search.value)">
+        </div>
+    </div>
+
+    <div class="row" *ngIf="screen.screen() < 1024">
+        <ng-container *ngIf="users.length; else noData">        
+            <div class="col-md-12" *ngFor="let user of users; let i = index">
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img class="img-fluid img-thumbnail rounded-image" [src]="user.avatar" />
+                            </div>
+                            <div class="col-md-9">
+                                <h5 class="card-title">{{user.first_name}} {{user.last_name}} - {{user.department}}</h5>
+                                <p class="card-text">{{user.email}}</p>
+                                <span *ngFor="let skill of user.skils" [ngClass]="skill.badge" class="badge">{{skill.title}}</span>
+                            </div>
+                        </div>            
+                    </div>
+                    <div class="card-footer text-muted">
+                        <button class="btn btn-success rounded mx-2" (click)="open(content, user)">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn btn-danger rounded" (click)="confirmDelete(user.id)">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <div class="row mb-2" *ngIf="screen.screen() > 1024">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">First Name</th>
+                  <th scope="col">Last Name</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Department</th>
+                  <th scope="col">Skils</th>
+                  <th scope="col">Avatar</th>
+                  <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngIf="users.length; else noData">
+                    <tr *ngFor="let user of users; let i = index">
+                        <td>{{i + 1}}</td>
+                        <td>{{user.first_name}}</td>
+                        <td>{{user.last_name}}</td>
+                        <td>{{user.email}}</td>
+                        <td>{{user.department}}</td>
+                        <td>
+                            <span *ngFor="let skill of user.skils" [ngClass]="skill.badge" class="badge">{{skill.title}}</span>
+                        </td>
+                        <td>
+                            <img class="img-fluid img-thumbnail rounded-image" [src]="user.avatar" />
+                        </td>
+                        <td>
+                            <button class="btn btn-success rounded mx-2" (click)="open(content, user)">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                            </button>
+                            <button class="btn btn-danger rounded" (click)="confirmDelete(user.id)">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<ng-template #content let-modal>
+	<div class="modal-header">
+		<h4 class="modal-title" id="modal-basic-title">Update User Department</h4>
+		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+	</div>
+	<div class="modal-body">
+		<form [formGroup]="departmentForm">
+			<div class="mb-3">
+				<label for="department">
+                    {{selectedUser.first_name}} {{selectedUser.last_name}} Current Department
+                </label>
+                <select class="form-control" id="department" formControlName="departmentId">
+                    <option *ngFor="let item of departments" [value]="item.departmentId">{{item.department}}</option>
+                </select>
+                <ng-container *ngIf="isSameDepartment">
+                    <small class="text-danger block m-10 error d-block">
+                      User cannot relocated to same department
+                    </small>
+                </ng-container>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Cancel</button>
+		<button type="button" class="btn btn-outline-primary" (click)="updateUserDepartment()" [disabled]="isSameDepartment">Save</button>
+	</div>
+</ng-template>
+
+<ng-template #noData>
+    <td colspan="99999999">
+        <div class="alert alert-danger text-center my-2" role="alert">
+            No Data Found!!
+        </div>
+    </td>
+</ng-template>
